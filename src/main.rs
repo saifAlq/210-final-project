@@ -29,9 +29,36 @@ fn main() {
                 graph.node_count(),   // Total number of nodes in the graph
                 graph.edge_count()    // Total number of edges in the graph
             );
+
+            // Perform BFS starting from a specific node (e.g., the first node in the dataset)
+let start_node = "0".to_string(); 
+println!("Performing BFS starting from node {}", start_node);
+
+let distances = graph.bfs(&start_node);
+println!("Distances from {} to the first 10 nodes:", start_node);
+
+// Display distances to the first 10 nodes
+for (node, distance) in distances.iter().take(10) {
+    println!("Node: {}, Distance: {}", node, distance);
+}
+// Perform clustering coefficient calculations
+println!("Calculating clustering coefficients...");
+
+// Calculate clustering coefficient for a specific node
+let specific_node = "0".to_string(); // Replace "0" with any valid node
+let coefficient = graph.clustering_coefficient(&specific_node);
+println!(
+    "Clustering coefficient for node {}: {:.4}",
+    specific_node, coefficient
+);
+
+// Calculate the average clustering coefficient for the entire graph
+let average_coefficient = graph.average_clustering_coefficient();
+println!("Average clustering coefficient for the graph: {:.4}", average_coefficient);
         }
 
         // If there is an error while loading the dataset
         Err(e) => eprintln!("Error loading dataset: {}", e),
     }
 }
+
