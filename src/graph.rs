@@ -124,3 +124,97 @@ impl Graph {
         total_coefficient / node_count as f64
     }
 }
+
+impl Graph {
+    /// Calculate the degree of each node and return as a HashMap
+    pub fn degree_distribution(&self) -> HashMap<String, usize> {
+        let mut degree_map = HashMap::new();
+
+        for (node, neighbors) in &self.adjacency_list {
+            degree_map.insert(node.clone(), neighbors.len());
+        }
+
+        degree_map
+    }
+
+    /// Calculate the min, max, and average degree
+    pub fn degree_statistics(&self) -> (usize, usize, f64) {
+        let degree_map = self.degree_distribution();
+        let mut min_degree = usize::MAX;
+        let mut max_degree = usize::MIN;
+        let mut total_degree = 0;
+
+        for &degree in degree_map.values() {
+            if degree < min_degree {
+                min_degree = degree;
+            }
+            if degree > max_degree {
+                max_degree = degree;
+            }
+            total_degree += degree;
+        }
+
+        let average_degree = total_degree as f64 / degree_map.len() as f64;
+
+        (min_degree, max_degree, average_degree)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_add_edge() {
+        let mut graph = Graph::new();
+        graph.add_edge("A".to_string(), "B".to_string());
+        graph.add_edge("B".to_string(), "C".to_string());
+
+        assert_eq!(graph.node_count(), 3); // 3 unique nodes
+        assert_eq!(graph.edge_count(), 2); // 2 unique edges
+    }
+
+    #[test]
+    fn test_bfs() {
+        let mut graph = Graph::new();
+        graph.add_edge("A".to_string(), "B".to_string());
+        graph.add_edge("B".to_string(), "C".to_string());
+        graph.add_edge("C".to_string(), "D".to_string());
+
+        let distances = graph.bfs(&"A".to_string());
+        assert_eq!(distances["A"], 0); // Start node distance
+        assert_eq!(distances["B"], 1);
+        assert_eq!(distances["C"], 2);
+        assert_eq!(distances["D"], 3);
+    }
+
+    #[test]
+    fn test_clustering_coefficient() {
+        let mut graph = Graph::new();
+        graph.add_edge("A".to_string(), "B".to_string());
+        graph.add_edge("B".to_string(), "C".to_string());
+        graph.add_edge("C".to_string(), "A".to_string()); // Triangle
+
+        let coefficient = graph.clustering_coefficient(&"A".to_string());
+        assert!((coefficient - 1.0).abs() < f64::EPSILON); // Fully connected neighbors
+
+        graph.add_edge("A".to_string(), "D".to_string());
+        let coefficient = graph.clustering_coefficient(&"A".to_string());
+        assert!((coefficient - 0.3333).abs() < 0.001); // Adjusted coefficient
+    }
+
+    #[test]
+    fn test_degree_statistics() {
+        let mut graph = Graph::new();
+        graph.add_edge("A".to_string(), "B".to_string());
+        graph.add_edge("B".to_string(), "C".to_string());
+        graph.add_edge("C".to_string(), "D".to_string());
+
+        let (min_degree, max_degree, avg_degree) = graph.degree_statistics();
+
+        assert_eq!(min_degree, 1); // Nodes A and D have degree 1
+        assert_eq!(max_degree, 2); // Nodes B and C have degree 2
+        assert!((avg_degree - 1.5).abs() < f64::EPSILON); // Average degree
+    }
+}
+

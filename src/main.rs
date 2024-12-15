@@ -23,6 +23,31 @@ fn main() {
                 graph.add_edge(source, target); // Add each edge to the graph
             }
 
+            // Degree distribution analysis
+println!("Calculating degree distribution...");
+
+let degree_stats = graph.degree_statistics();
+println!(
+    "Degree statistics - Min: {}, Max: {}, Average: {:.2}",
+    degree_stats.0, degree_stats.1, degree_stats.2
+);
+
+let degree_map = graph.degree_distribution();
+println!("Degrees of the first 10 nodes:");
+for (node, degree) in degree_map.iter().take(10) {
+    println!("Node: {}, Degree: {}", node, degree);
+}
+
+// Identify nodes with the highest and lowest degrees
+if let Some((node, max_degree)) = degree_map.iter().max_by_key(|&(_, &degree)| degree) {
+    println!("Node with the highest degree: {}, Degree: {}", node, max_degree);
+}
+
+if let Some((node, min_degree)) = degree_map.iter().min_by_key(|&(_, &degree)| degree) {
+    println!("Node with the lowest degree: {}, Degree: {}", node, min_degree);
+}
+
+
             // Print basic statistics about the constructed graph
             println!(
                 "Graph constructed with {} nodes and {} edges.",
