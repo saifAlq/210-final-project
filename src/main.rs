@@ -3,7 +3,16 @@ mod graph; // Import the graph module for graph-related operations
 
 fn main() {
     // Path to the dataset file
-    let dataset_path: &str = "../data/facebook_combined.txt";
+    use std::path::Path;
+
+let dataset_path = if Path::new("../facebook_combined.txt").exists() {
+    "../facebook_combined.txt"
+} else if Path::new("facebook_combined.txt").exists() {
+    "facebook_combined.txt"
+} else {
+    panic!("Dataset file not found in expected locations!");
+};
+
 
     // Attempt to load the dataset using the utility function
     match utils::load_dataset(dataset_path) {
